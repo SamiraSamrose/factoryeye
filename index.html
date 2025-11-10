@@ -1,0 +1,2274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FactoryEye - Industrial IoT Monitoring Platform</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    
+    <!-- Vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.prod.js"></script>
+    
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <style>
+        :root {
+            --primary-blue: #1a73e8;
+            --success-green: #34a853;
+            --warning-yellow: #fbbc04;
+            --danger-red: #ea4335;
+            --dark-bg: #1e1e2e;
+            --card-bg: #ffffff;
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --border-color: #e0e0e0;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+        
+        /* Header Styles */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(52, 168, 83, 0.1);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--success-green);
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--success-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+        
+        /* Main Container */
+        .main-container {
+            max-width: 1800px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+        
+        /* KPI Cards - Single Row */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .kpi-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--gradient-1);
+        }
+        
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .kpi-card.primary::before { background: var(--gradient-1); }
+        .kpi-card.success::before { background: var(--gradient-4); }
+        .kpi-card.warning::before { background: var(--gradient-2); }
+        .kpi-card.danger::before { background: var(--gradient-2); }
+        
+        .kpi-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+        
+        .kpi-icon.primary { background: var(--gradient-1); }
+        .kpi-icon.success { background: var(--gradient-4); }
+        .kpi-icon.warning { background: var(--gradient-2); }
+        .kpi-icon.danger { background: var(--gradient-2); }
+        
+        .kpi-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+        }
+        
+        .kpi-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.3rem;
+        }
+        
+        .kpi-change {
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        
+        .kpi-change.positive { color: var(--success-green); }
+        .kpi-change.negative { color: var(--danger-red); }
+        
+        /* Sparkline Container */
+        .sparkline-container {
+            margin-top: 0.5rem;
+            height: 25px;
+        }
+        
+        /* Chart Cards */
+        .chart-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+        }
+        
+        .chart-card.compact {
+            height: 550px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .chart-controls {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0, 0, 0, 0.03);
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+        
+        .control-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        
+        .viz-select {
+            padding: 0.4rem 0.8rem;
+            border: 2px solid var(--border-color);
+            background: white;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .viz-select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+        }
+        
+        .btn-chart {
+            padding: 0.4rem 0.8rem;
+            border: 2px solid var(--border-color);
+            background: white;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-chart:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            background: rgba(26, 115, 232, 0.05);
+        }
+        
+        .btn-chart.active {
+            background: var(--gradient-1);
+            color: white;
+            border-color: transparent;
+        }
+        
+        .chart-content {
+            flex: 1;
+            min-height: 0;
+            position: relative;
+        }
+        
+        /* Anomaly List */
+        .anomaly-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            max-height: 550px;
+            overflow-y: auto;
+        }
+        
+        .anomaly-item {
+            padding: 1rem;
+            border-left: 4px solid;
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .anomaly-item:hover {
+            background: rgba(0, 0, 0, 0.04);
+            transform: translateX(5px);
+        }
+        
+        .anomaly-item.critical { border-left-color: var(--danger-red); }
+        .anomaly-item.high { border-left-color: var(--warning-yellow); }
+        .anomaly-item.medium { border-left-color: var(--primary-blue); }
+        .anomaly-item.low { border-left-color: var(--success-green); }
+        
+        .anomaly-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .anomaly-sensor {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+        
+        .severity-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .severity-badge.critical {
+            background: rgba(234, 67, 53, 0.15);
+            color: var(--danger-red);
+        }
+        
+        .severity-badge.high {
+            background: rgba(251, 188, 4, 0.15);
+            color: var(--warning-yellow);
+        }
+        
+        .severity-badge.medium {
+            background: rgba(26, 115, 232, 0.15);
+            color: var(--primary-blue);
+        }
+        
+        .severity-badge.low {
+            background: rgba(52, 168, 83, 0.15);
+            color: var(--success-green);
+        }
+        
+        .anomaly-details {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        /* Demo Controls */
+        .demo-controls {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+        }
+        
+        .demo-control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .control-input {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .control-input input,
+        .control-input select {
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        
+        .control-input input:focus,
+        .control-input select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+        }
+        
+        .btn-demo {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-demo-primary {
+            background: var(--gradient-1);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-demo-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+        
+        .btn-demo-success {
+            background: var(--gradient-4);
+            color: white;
+            box-shadow: 0 4px 15px rgba(67, 233, 123, 0.4);
+        }
+        
+        .btn-demo-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 233, 123, 0.5);
+        }
+        
+        .btn-demo-warning {
+            background: var(--gradient-2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+        }
+        
+        .btn-demo-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.5);
+        }
+        
+        /* Real-time Feed */
+        .realtime-feed {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .feed-item {
+            padding: 0.75rem;
+            border-left: 3px solid var(--primary-blue);
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            font-size: 0.85rem;
+            animation: slideInLeft 0.3s ease;
+        }
+        
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+        }
+        
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Data Info Badge */
+        .data-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            background: rgba(26, 115, 232, 0.1);
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Report Modal */
+        .report-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9998;
+            backdrop-filter: blur(5px);
+        }
+        
+        .report-content {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .report-section {
+            margin-bottom: 2rem;
+        }
+        
+        .report-section h3 {
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-blue);
+            padding-bottom: 0.5rem;
+        }
+        
+        .insight-box {
+            background: rgba(26, 115, 232, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .recommendation-item {
+            background: rgba(52, 168, 83, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--success-green);
+            margin-bottom: 0.75rem;
+        }
+        
+        /* Additional Visualizations */
+        .viz-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .kpi-row {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero-title { font-size: 1.8rem; }
+            .kpi-row { grid-template-columns: repeat(2, 1fr); }
+            .demo-control-grid { grid-template-columns: 1fr; }
+            .chart-header { flex-direction: column; gap: 1rem; }
+            .chart-controls { width: 100%; justify-content: center; }
+            .viz-grid { grid-template-columns: 1fr; }
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--gradient-1);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gradient-2);
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Loading Overlay -->
+        <div v-if="loading" class="loading-overlay animate__animated animate__fadeIn">
+            <div class="loading-content">
+                <div class="loading-spinner"></div>
+                <h3>Loading FactoryEye Dashboard...</h3>
+                <p>Initializing AI-powered monitoring system</p>
+            </div>
+        </div>
+
+        <!-- Report Modal -->
+        <div v-if="showReportModal" class="report-modal animate__animated animate__fadeIn" @click.self="showReportModal = false">
+            <div class="report-content animate__animated animate__zoomIn">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 style="color: var(--primary-blue); margin: 0;">
+                        <i class="fas fa-file-alt"></i> AI-Generated Analysis Report
+                    </h2>
+                    <button class="btn-close" @click="showReportModal = false"></button>
+                </div>
+                
+                <div class="report-section">
+                    <h3><i class="fas fa-chart-line"></i> Executive Summary</h3>
+                    <div class="insight-box">
+                        <p><strong>Analysis Period:</strong> {{ reportData.period }}</p>
+                        <p><strong>Total Data Points Analyzed:</strong> {{ reportData.dataPoints }}</p>
+                        <p><strong>AI Models Used:</strong> Gemma (Anomaly Detection), Gemini (Insights), Imagen (Visualizations)</p>
+                        <p><strong>Overall System Health:</strong> <span :style="{color: reportData.health > 90 ? 'var(--success-green)' : 'var(--warning-yellow)'}">{{ reportData.health }}%</span></p>
+                    </div>
+                </div>
+                
+                <div class="report-section">
+                    <h3><i class="fas fa-brain"></i> AI-Generated Insights</h3>
+                    <div class="insight-box">
+                        <p><strong>Key Findings:</strong></p>
+                        <ul>
+                            <li v-for="(insight, index) in reportData.insights" :key="index">{{ insight }}</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="report-section">
+                    <h3><i class="fas fa-lightbulb"></i> Recommendations</h3>
+                    <div v-for="(rec, index) in reportData.recommendations" :key="index" class="recommendation-item">
+                        <strong>{{ rec.title }}</strong>
+                        <p>{{ rec.description }}</p>
+                    </div>
+                </div>
+                
+                <div class="report-section">
+                    <h3><i class="fas fa-chart-bar"></i> Performance Metrics</h3>
+                    <canvas id="reportChart" style="max-height: 300px;"></canvas>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <button class="btn btn-demo-primary" @click="downloadReport">
+                        <i class="fas fa-download"></i> Download Full Report
+                    </button>
+                    <button class="btn btn-demo-success ms-2" @click="showReportModal = false">
+                        <i class="fas fa-check"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header class="header animate__animated animate__fadeInDown">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="logo">
+                        <i class="fas fa-industry"></i> FactoryEye
+                    </div>
+                    <div class="d-flex align-items-center gap-4">
+                        <span class="status-badge">
+                            <span class="status-dot"></span>
+                            System Online
+                        </span>
+                        <div class="text-end">
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                                {{ currentTime }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Hero Section -->
+            <div class="hero-section animate__animated animate__fadeInUp">
+                <h1 class="hero-title">
+                    <i class="fas fa-brain"></i> AI-Powered Industrial IoT Monitoring
+                </h1>
+                <p class="hero-subtitle">
+                    Real-time anomaly detection, predictive maintenance, and efficiency optimization powered by Gemma, Gemini, and Imagen on Google Cloud
+                </p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <button class="btn btn-demo-primary" @click="startDemoSimulation">
+                        <i class="fas fa-play"></i> {{ continuousRunning ? 'Stop' : 'Start' }} Live Demo
+                    </button>
+                    <button class="btn btn-demo-success" @click="generateReport">
+                        <i class="fas fa-file-alt"></i> Generate AI Report
+                    </button>
+                    <button class="btn btn-demo-warning" @click="simulateAnomaly">
+                        <i class="fas fa-exclamation-triangle"></i> Simulate Anomaly
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI Row - Single Line -->
+            <div class="kpi-row animate__animated animate__fadeInUp">
+                <div class="kpi-card primary" v-for="(kpi, index) in kpis" :key="index" :class="kpi.type">
+                    <div class="kpi-icon" :class="kpi.type">
+                        <i :class="kpi.icon"></i>
+                    </div>
+                    <div class="kpi-label">{{ kpi.label }}</div>
+                    <div class="kpi-value">{{ kpi.value }}{{ kpi.unit }}</div>
+                    <div class="kpi-change" :class="kpi.changeType">
+                        <i :class="kpi.changeType === 'positive' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
+                        {{ kpi.change }}
+                    </div>
+                    <div class="sparkline-container">
+                        <canvas :id="'sparkline-' + index" height="25"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Charts Row 1 -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="chart-card compact animate__animated animate__fadeInLeft">
+                        <div class="chart-header">
+                            <h3 class="chart-title">
+                                <i class="fas fa-chart-line"></i> Real-Time Anomaly Detection
+                            </h3>
+                            <div class="chart-controls">
+                                <div class="control-group">
+                                    <span class="control-label">Visualization:</span>
+                                    <select class="viz-select" v-model="vizMode" @change="switchVisualization">
+                                        <option value="plotly">Plotly WebGL (High Performance)</option>
+                                        <option value="chartjs">Lightweight Canvas (Chart.js)</option>
+                                        <option value="micro">Micro Sparklines</option>
+                                    </select>
+                                </div>
+                                <div class="control-group">
+                                    <span class="control-label">Window:</span>
+                                    <button class="btn-chart" :class="{ active: timeWindow === '5m' }" @click="changeTimeWindow('5m')">5M</button>
+                                    <button class="btn-chart" :class="{ active: timeWindow === '15m' }" @click="changeTimeWindow('15m')">15M</button>
+                                    <button class="btn-chart" :class="{ active: timeWindow === '1h' }" @click="changeTimeWindow('1h')">1H</button>
+                                    <button class="btn-chart" :class="{ active: timeWindow === '24h' }" @click="changeTimeWindow('24h')">24H</button>
+                                </div>
+                                <div class="control-group">
+                                    <span class="control-label">Resolution:</span>
+                                    <select class="viz-select" v-model="dataResolution" @change="updateResolution">
+                                        <option value="full">Full (All Points)</option>
+                                        <option value="downsample">Downsampled (Every 10th)</option>
+                                        <option value="rolling">Rolling Average</option>
+                                        <option value="dynamic">Dynamic Resolution</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="data-info">
+                            <i class="fas fa-info-circle"></i>
+                            Showing {{ displayedDataPoints }} of {{ totalDataPoints }} points | Update Rate: {{ updateRate }}ms
+                        </div>
+                        <div class="chart-content">
+                            <!-- Chart.js Canvas -->
+                            <canvas id="anomalyChart" v-show="vizMode === 'chartjs'" style="width: 100%; height: 100%;"></canvas>
+                            <!-- Plotly Container -->
+                            <div id="plotlyChart" v-show="vizMode === 'plotly'" style="width: 100%; height: 100%;"></div>
+                            <!-- Micro Sparklines -->
+                            <div v-show="vizMode === 'micro'" style="height: 100%; display: flex; flex-direction: column; gap: 1rem;">
+                                <div style="flex: 1;">
+                                    <h6 style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Temperature Trend</h6>
+                                    <canvas id="microTemp" style="height: 100%;"></canvas>
+                                </div>
+                                <div style="flex: 1;">
+                                    <h6 style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Vibration Trend</h6>
+                                    <canvas id="microVib" style="height: 100%;"></canvas>
+                                </div>
+                                <div style="flex: 1;">
+                                    <h6 style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Anomaly Score</h6>
+                                    <canvas id="microAnomaly" style="height: 100%;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="anomaly-card animate__animated animate__fadeInRight">
+                        <h3 class="chart-title mb-3">
+                            <i class="fas fa-bell"></i> Recent Anomalies
+                        </h3>
+                        <div v-for="(anomaly, index) in recentAnomalies" :key="index" 
+                             class="anomaly-item" :class="anomaly.severity">
+                            <div class="anomaly-header">
+                                <span class="anomaly-sensor">{{ anomaly.sensor }}</span>
+                                <span class="severity-badge" :class="anomaly.severity">
+                                    {{ anomaly.severity }}
+                                </span>
+                            </div>
+                            <div class="anomaly-details">
+                                <span><i class="fas fa-clock"></i> {{ anomaly.time }}</span>
+                                <span><i class="fas fa-chart-bar"></i> Score: {{ anomaly.score }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Visualizations Grid -->
+            <div class="viz-grid animate__animated animate__fadeInUp">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-fire"></i> Equipment Performance Heatmap
+                        </h3>
+                    </div>
+                    <canvas id="heatmapChart" style="max-height: 300px;"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-cog"></i> Remaining Useful Life (RUL)
+                        </h3>
+                    </div>
+                    <canvas id="rulChart" style="max-height: 300px;"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-tachometer-alt"></i> Efficiency Trends
+                        </h3>
+                    </div>
+                    <canvas id="efficiencyChart" style="max-height: 300px;"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-heartbeat"></i> System Health Monitor
+                        </h3>
+                    </div>
+                    <canvas id="healthChart" style="max-height: 300px;"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-wrench"></i> Maintenance Schedule
+                        </h3>
+                    </div>
+                    <canvas id="maintenanceChart" style="max-height: 300px;"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-dollar-sign"></i> Cost Analysis
+                        </h3>
+                    </div>
+                    <canvas id="costChart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+
+            <!-- Real-Time Feed and Demo Controls Row -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="demo-controls animate__animated animate__fadeInUp">
+                        <h3 class="chart-title mb-3">
+                            <i class="fas fa-sliders-h"></i> Interactive Demo Controls
+                        </h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                            Adjust sensor parameters and simulate different scenarios to test the AI-powered monitoring system
+                        </p>
+                        <div class="demo-control-grid">
+                            <div class="control-input">
+                                <label class="control-label">Sensor ID</label>
+                                <input type="text" v-model="demoControls.sensorId" placeholder="sensor_001">
+                            </div>
+                            <div class="control-input">
+                                <label class="control-label">Machine ID</label>
+                                <input type="text" v-model="demoControls.machineId" placeholder="machine_001">
+                            </div>
+                            <div class="control-input">
+                                <label class="control-label">Temperature (°C)</label>
+                                <input type="number" v-model="demoControls.temperature" min="20" max="100">
+                            </div>
+                            <div class="control-input">
+                                <label class="control-label">Vibration (mm/s)</label>
+                                <input type="number" v-model="demoControls.vibration" min="0" max="50">
+                            </div>
+                            <div class="control-input">
+                                <label class="control-label">Pressure (bar)</label>
+                                <input type="number" v-model="demoControls.pressure" min="0" max="10" step="0.1">
+                            </div>
+                            <div class="control-input">
+                                <label class="control-label">RPM</label>
+                                <input type="number" v-model="demoControls.rpm" min="0" max="5000">
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 mt-3 flex-wrap">
+                            <button class="btn btn-demo-primary" @click="sendSensorData">
+                                <i class="fas fa-paper-plane"></i> Send Data
+                            </button>
+                            <button class="btn btn-demo-warning" @click="sendAnomalousData">
+                                <i class="fas fa-exclamation-circle"></i> Send Anomalous Data
+                            </button>
+                            <button class="btn btn-demo-success" @click="toggleContinuousSimulation">
+                                <i :class="continuousRunning ? 'fas fa-stop' : 'fas fa-play'"></i>
+                                {{ continuousRunning ? 'Stop' : 'Start' }} Continuous
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="realtime-feed animate__animated animate__fadeInUp">
+                        <h3 class="chart-title mb-3">
+                            <i class="fas fa-satellite-dish"></i> Real-Time Feed
+                        </h3>
+                        <div v-for="(item, index) in realtimeFeed" :key="index" class="feed-item">
+                            <strong>{{ item.time }}</strong> - {{ item.message }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Main Application Script -->
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    loading: true,
+                    currentTime: '',
+                    vizMode: 'plotly', // Default to Plotly WebGL
+                    timeWindow: '24h', // Default to 24H
+                    dataResolution: 'full', // Default to Full
+                    continuousRunning: false,
+                    continuousInterval: null,
+                    updateRate: 100,
+                    displayedDataPoints: 0,
+                    totalDataPoints: 0,
+                    showReportModal: false,
+                    reportData: {
+                        period: 'Last 24 Hours',
+                        dataPoints: 0,
+                        health: 0,
+                        insights: [],
+                        recommendations: []
+                    },
+                    fullDataset: {
+                        timestamps: [],
+                        temperature: [],
+                        vibration: [],
+                        anomalyFlags: []
+                    },
+                    kpis: [
+                        {
+                            label: 'Active Sensors',
+                            value: 48,
+                            unit: '',
+                            change: '+4',
+                            changeType: 'positive',
+                            icon: 'fas fa-broadcast-tower',
+                            type: 'primary',
+                            sparklineData: []
+                        },
+                        {
+                            label: 'Machines Online',
+                            value: 12,
+                            unit: '',
+                            change: '100%',
+                            changeType: 'positive',
+                            icon: 'fas fa-industry',
+                            type: 'success',
+                            sparklineData: []
+                        },
+                        {
+                            label: 'Anomalies (24h)',
+                            value: 7,
+                            unit: '',
+                            change: '-3',
+                            changeType: 'positive',
+                            icon: 'fas fa-exclamation-triangle',
+                            type: 'warning',
+                            sparklineData: []
+                        },
+                        {
+                            label: 'Critical Events',
+                            value: 2,
+                            unit: '',
+                            change: 'Urgent',
+                            changeType: 'negative',
+                            icon: 'fas fa-bell',
+                            type: 'danger',
+                            sparklineData: []
+                        },
+                        {
+                            label: 'Uptime',
+                            value: 98.7,
+                            unit: '%',
+                            change: '+0.3%',
+                            changeType: 'positive',
+                            icon: 'fas fa-check-circle',
+                            type: 'success',
+                            sparklineData: []
+                        },
+                        {
+                            label: 'Efficiency',
+                            value: 94.2,
+                            unit: '%',
+                            change: '+2.1',
+                            changeType: 'positive',
+                            icon: 'fas fa-tachometer-alt',
+                            type: 'primary',
+                            sparklineData: []
+                        },
+                        {
+                            label: 'Avg Temp',
+                            value: 67.3,
+                            unit: '°C',
+                            change: 'Normal',
+                            changeType: 'positive',
+                            icon: 'fas fa-thermometer-half',
+                            type: 'primary',
+                            sparklineData: []
+                        },
+                        {
+                            label: 'Cost Savings',
+                            value: 15.2,
+                            unit: 'K',
+                            change: 'Month',
+                            changeType: 'positive',
+                            icon: 'fas fa-dollar-sign',
+                            type: 'success',
+                            sparklineData: []
+                        }
+                    ],
+                    recentAnomalies: [
+                        {
+                            sensor: 'Sensor_034 - Machine_003',
+                            severity: 'critical',
+                            time: '2 mins ago',
+                            score: '0.96'
+                        },
+                        {
+                            sensor: 'Sensor_012 - Machine_001',
+                            severity: 'high',
+                            time: '15 mins ago',
+                            score: '0.88'
+                        },
+                        {
+                            sensor: 'Sensor_045 - Machine_005',
+                            severity: 'medium',
+                            time: '1 hour ago',
+                            score: '0.72'
+                        },
+                        {
+                            sensor: 'Sensor_028 - Machine_002',
+                            severity: 'low',
+                            time: '2 hours ago',
+                            score: '0.55'
+                        },
+                        {
+                            sensor: 'Sensor_051 - Machine_006',
+                            severity: 'medium',
+                            time: '3 hours ago',
+                            score: '0.68'
+                        }
+                    ],
+                    realtimeFeed: [],
+                    demoControls: {
+                        sensorId: 'sensor_demo_001',
+                        machineId: 'machine_001',
+                        temperature: 65,
+                        vibration: 15,
+                        pressure: 5.5,
+                        rpm: 3000
+                    },
+                    charts: {}
+                }
+            },
+            mounted() {
+                this.initializeApp();
+            },
+            methods: {
+                async initializeApp() {
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    
+                    this.loading = false;
+                    this.updateTime();
+                    setInterval(() => this.updateTime(), 1000);
+                    
+                    this.generateLargeDataset(1000);
+                    
+                    this.$nextTick(() => {
+                        this.initializeCharts();
+                        this.initializeSparklines();
+                        this.startRealtimeUpdates();
+                    });
+                    
+                    this.addToFeed('System initialized successfully');
+                    this.addToFeed('Connected to 48 sensors across 12 machines');
+                    this.addToFeed('AI models loaded: Gemma, Gemini, Imagen');
+                    this.addToFeed('Plotly WebGL renderer active for optimal performance');
+                },
+                
+                generateLargeDataset(pointCount) {
+                    const now = new Date();
+                    
+                    for (let i = pointCount; i >= 0; i--) {
+                        const time = new Date(now - i * 60000);
+                        this.fullDataset.timestamps.push(time);
+                        
+                        const baseTemp = 65 + Math.sin(i / 30) * 8 + Math.cos(i / 10) * 3;
+                        const baseVib = 15 + Math.sin(i / 20) * 4 + Math.cos(i / 8) * 2;
+                        
+                        const isAnomaly = Math.random() > 0.95;
+                        const tempValue = isAnomaly ? baseTemp + Math.random() * 20 : baseTemp + (Math.random() - 0.5) * 2;
+                        const vibValue = isAnomaly ? baseVib + Math.random() * 15 : baseVib + (Math.random() - 0.5);
+                        
+                        this.fullDataset.temperature.push(tempValue);
+                        this.fullDataset.vibration.push(vibValue);
+                        this.fullDataset.anomalyFlags.push(isAnomaly ? vibValue : null);
+                    }
+                    
+                    this.totalDataPoints = pointCount + 1;
+                },
+                
+                updateTime() {
+                    const now = new Date();
+                    this.currentTime = now.toLocaleString('en-US', {
+                        weekday: 'short',
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+                },
+                
+                initializeCharts() {
+                    // Initialize Plotly as default
+                    this.initPlotlyChart();
+                    this.initHeatmapChart();
+                    this.initRULChart();
+                    this.initEfficiencyChart();
+                    this.initHealthChart();
+                    this.initMaintenanceChart();
+                    this.initCostChart();
+                },
+                
+                getProcessedData() {
+                    let windowSize;
+                    switch(this.timeWindow) {
+                        case '5m': windowSize = 5; break;
+                        case '15m': windowSize = 15; break;
+                        case '1h': windowSize = 60; break;
+                        case '24h': windowSize = 1440; break;
+                        default: windowSize = 1440;
+                    }
+                    
+                    const startIndex = Math.max(0, this.fullDataset.timestamps.length - windowSize);
+                    const endIndex = this.fullDataset.timestamps.length;
+                    
+                    let timestamps = this.fullDataset.timestamps.slice(startIndex, endIndex);
+                    let temperature = this.fullDataset.temperature.slice(startIndex, endIndex);
+                    let vibration = this.fullDataset.vibration.slice(startIndex, endIndex);
+                    let anomalyFlags = this.fullDataset.anomalyFlags.slice(startIndex, endIndex);
+                    
+                    switch(this.dataResolution) {
+                        case 'downsample':
+                            const step = 10;
+                            timestamps = timestamps.filter((_, i) => i % step === 0);
+                            temperature = temperature.filter((_, i) => i % step === 0);
+                            vibration = vibration.filter((_, i) => i % step === 0);
+                            anomalyFlags = anomalyFlags.filter((_, i) => i % step === 0);
+                            this.updateRate = 1000;
+                            break;
+                            
+                        case 'rolling':
+                            const windowSize = 5;
+                            temperature = this.applyRollingAverage(temperature, windowSize);
+                            vibration = this.applyRollingAverage(vibration, windowSize);
+                            this.updateRate = 500;
+                            break;
+                            
+                        case 'dynamic':
+                            const recentCount = Math.floor(timestamps.length * 0.2);
+                            const oldData = {
+                                timestamps: timestamps.slice(0, -recentCount).filter((_, i) => i % 5 === 0),
+                                temperature: temperature.slice(0, -recentCount).filter((_, i) => i % 5 === 0),
+                                vibration: vibration.slice(0, -recentCount).filter((_, i) => i % 5 === 0),
+                                anomalyFlags: anomalyFlags.slice(0, -recentCount).filter((_, i) => i % 5 === 0)
+                            };
+                            const recentData = {
+                                timestamps: timestamps.slice(-recentCount),
+                                temperature: temperature.slice(-recentCount),
+                                vibration: vibration.slice(-recentCount),
+                                anomalyFlags: anomalyFlags.slice(-recentCount)
+                            };
+                            timestamps = [...oldData.timestamps, ...recentData.timestamps];
+                            temperature = [...oldData.temperature, ...recentData.temperature];
+                            vibration = [...oldData.vibration, ...recentData.vibration];
+                            anomalyFlags = [...oldData.anomalyFlags, ...recentData.anomalyFlags];
+                            this.updateRate = 300;
+                            break;
+                            
+                        default:
+                            this.updateRate = 100;
+                    }
+                    
+                    this.displayedDataPoints = timestamps.length;
+                    
+                    return {
+                        labels: timestamps.map(t => t.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })),
+                        temperature,
+                        vibration,
+                        anomalyFlags
+                    };
+                },
+                
+                applyRollingAverage(data, windowSize) {
+                    const result = [];
+                    for (let i = 0; i < data.length; i++) {
+                        const start = Math.max(0, i - windowSize + 1);
+                        const window = data.slice(start, i + 1);
+                        const avg = window.reduce((sum, val) => sum + val, 0) / window.length;
+                        result.push(avg);
+                    }
+                    return result;
+                },
+                
+                initPlotlyChart() {
+                    const processedData = this.getProcessedData();
+                    
+                    const trace1 = {
+                        x: processedData.labels,
+                        y: processedData.temperature,
+                        type: 'scattergl',
+                        mode: 'lines',
+                        name: 'Temperature (°C)',
+                        line: { color: '#ea4335', width: 2 },
+                        fill: 'tozeroy',
+                        fillcolor: 'rgba(234, 67, 53, 0.1)'
+                    };
+                    
+                    const trace2 = {
+                        x: processedData.labels,
+                        y: processedData.vibration,
+                        type: 'scattergl',
+                        mode: 'lines',
+                        name: 'Vibration (mm/s)',
+                        line: { color: '#fbbc04', width: 2 },
+                        fill: 'tozeroy',
+                        fillcolor: 'rgba(251, 188, 4, 0.1)'
+                    };
+                    
+                    const anomalyIndices = processedData.anomalyFlags
+                        .map((val, idx) => val !== null ? idx : null)
+                        .filter(idx => idx !== null);
+                    
+                    const trace3 = {
+                        x: anomalyIndices.map(idx => processedData.labels[idx]),
+                        y: anomalyIndices.map(idx => processedData.anomalyFlags[idx]),
+                        type: 'scatter',
+                        mode: 'markers',
+                        name: 'Anomaly Detected',
+                        marker: {
+                            color: '#1a73e8',
+                            size: 10,
+                            symbol: 'triangle-up'
+                        }
+                    };
+                    
+                    const layout = {
+                        margin: { l: 50, r: 30, t: 10, b: 50 },
+                        plot_bgcolor: 'rgba(0,0,0,0)',
+                        paper_bgcolor: 'rgba(0,0,0,0)',
+                        xaxis: {
+                            showgrid: false,
+                            tickangle: 0,
+                            nticks: 10
+                        },
+                        yaxis: {
+                            showgrid: true,
+                            gridcolor: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        legend: {
+                            orientation: 'h',
+                            y: -0.2,
+                            x: 0.5,
+                            xanchor: 'center'
+                        },
+                        hovermode: 'x unified'
+                    };
+                    
+                    const config = {
+                        responsive: true,
+                        displayModeBar: false
+                    };
+                    
+                    Plotly.newPlot('plotlyChart', [trace1, trace2, trace3], layout, config);
+                },
+                
+                initAnomalyChart() {
+                    const ctx = document.getElementById('anomalyChart');
+                    const processedData = this.getProcessedData();
+                    
+                    this.charts.anomalyChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: processedData.labels,
+                            datasets: [
+                                {
+                                    label: 'Temperature (°C)',
+                                    data: processedData.temperature,
+                                    borderColor: '#ea4335',
+                                    backgroundColor: 'rgba(234, 67, 53, 0.1)',
+                                    tension: 0.4,
+                                    fill: true,
+                                    borderWidth: 2,
+                                    pointRadius: 0,
+                                    pointHitRadius: 10
+                                },
+                                {
+                                    label: 'Vibration (mm/s)',
+                                    data: processedData.vibration,
+                                    borderColor: '#fbbc04',
+                                    backgroundColor: 'rgba(251, 188, 4, 0.1)',
+                                    tension: 0.4,
+                                    fill: true,
+                                    borderWidth: 2,
+                                    pointRadius: 0,
+                                    pointHitRadius: 10
+                                },
+                                {
+                                    label: 'Anomaly Detected',
+                                    data: processedData.anomalyFlags,
+                                    borderColor: '#1a73e8',
+                                    backgroundColor: '#1a73e8',
+                                    pointRadius: 6,
+                                    pointStyle: 'triangle',
+                                    showLine: false
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            animation: false,
+                            interaction: {
+                                mode: 'index',
+                                intersect: false
+                            },
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'bottom',
+                                    labels: {
+                                        usePointStyle: true,
+                                        padding: 10,
+                                        font: { size: 11, weight: '600' }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                                    ticks: { font: { size: 10, weight: '600' } }
+                                },
+                                x: {
+                                    grid: { display: false },
+                                    ticks: { 
+                                        font: { size: 10, weight: '600' },
+                                        maxRotation: 0,
+                                        autoSkip: true,
+                                        maxTicksLimit: 10
+                                    }
+                                }
+                            }
+                        }
+                    });
+                },
+                
+                initMicroSparklines() {
+                    const processedData = this.getProcessedData();
+                    
+                    const ctxTemp = document.getElementById('microTemp');
+                    this.charts.microTemp = new Chart(ctxTemp, {
+                        type: 'line',
+                        data: {
+                            labels: processedData.labels,
+                            datasets: [{
+                                data: processedData.temperature,
+                                borderColor: '#ea4335',
+                                borderWidth: 1.5,
+                                fill: false,
+                                pointRadius: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            animation: false,
+                            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                            scales: {
+                                x: { display: false },
+                                y: { display: false }
+                            }
+                        }
+                    });
+                    
+                    const ctxVib = document.getElementById('microVib');
+                    this.charts.microVib = new Chart(ctxVib, {
+                        type: 'line',
+                        data: {
+                            labels: processedData.labels,
+                            datasets: [{
+                                data: processedData.vibration,
+                                borderColor: '#fbbc04',
+                                borderWidth: 1.5,
+                                fill: false,
+                                pointRadius: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            animation: false,
+                            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                            scales: {
+                                x: { display: false },
+                                y: { display: false }
+                            }
+                        }
+                    });
+                    
+                    const anomalyScores = processedData.temperature.map((temp, idx) => {
+                        const tempNorm = (temp - 60) / 40;
+                        const vibNorm = (processedData.vibration[idx] - 10) / 40;
+                        return Math.min(1, (tempNorm + vibNorm) / 2);
+                    });
+                    
+                    const ctxAnomaly = document.getElementById('microAnomaly');
+                    this.charts.microAnomaly = new Chart(ctxAnomaly, {
+                        type: 'bar',
+                        data: {
+                            labels: processedData.labels,
+                            datasets: [{
+                                data: anomalyScores,
+                                backgroundColor: anomalyScores.map(score => 
+                                    score > 0.8 ? '#ea4335' : score > 0.6 ? '#fbbc04' : '#34a853'
+                                ),
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            animation: false,
+                            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                            scales: {
+                                x: { display: false },
+                                y: { display: false, max: 1 }
+                            }
+                        }
+                    });
+                },
+                
+                initializeSparklines() {
+                    this.kpis.forEach((kpi, index) => {
+                        const data = [];
+                        for (let i = 20; i >= 0; i--) {
+                            const variation = (Math.random() - 0.5) * 5;
+                            data.push(parseFloat(kpi.value) + variation);
+                        }
+                        kpi.sparklineData = data;
+                        
+                        this.$nextTick(() => {
+                            const ctx = document.getElementById(`sparkline-${index}`);
+                            if (ctx) {
+                                new Chart(ctx, {
+                                    type: 'line',
+                                    data: {
+                                        labels: data.map((_, i) => i),
+                                        datasets: [{
+                                            data: data,
+                                            borderColor: kpi.changeType === 'positive' ? '#34a853' : '#ea4335',
+                                            borderWidth: 1.5,
+                                            fill: false,
+                                            pointRadius: 0,
+                                            tension: 0.4
+                                        }]
+                                    },
+                                    options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        animation: false,
+                                        plugins: {
+                                            legend: { display: false },
+                                            tooltip: { enabled: false }
+                                        },
+                                        scales: {
+                                            x: { display: false },
+                                            y: { display: false }
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    });
+                },
+                
+                initHeatmapChart() {
+                    const ctx = document.getElementById('heatmapChart');
+                    const machines = ['M-001', 'M-002', 'M-003', 'M-004', 'M-005', 'M-006'];
+                    const metrics = ['Temperature', 'Vibration', 'Pressure', 'RPM'];
+                    
+                    const datasets = metrics.map((metric, idx) => {
+                        const colors = ['#ea4335', '#fbbc04', '#34a853', '#1a73e8'];
+                        return {
+                            label: metric,
+                            data: machines.map(() => Math.random() * 100),
+                            backgroundColor: colors[idx],
+                            borderColor: 'white',
+                            borderWidth: 2,
+                            borderRadius: 6
+                        };
+                    });
+                    
+                    this.charts.heatmapChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: machines,
+                            datasets: datasets
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top',
+                                    labels: {
+                                        usePointStyle: true,
+                                        padding: 10,
+                                        font: { size: 11, weight: '600' }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 100,
+                                    grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                                    ticks: { font: { size: 10, weight: '600' } }
+                                },
+                                x: {
+                                    grid: { display: false },
+                                    ticks: { font: { size: 10, weight: '600' } }
+                                }
+                            }
+                        }
+                    });
+                },
+                
+                initRULChart() {
+                    const ctx = document.getElementById('rulChart');
+                    const machines = ['M-001', 'M-002', 'M-003', 'M-004', 'M-005', 'M-006'];
+                    const rulValues = [720, 168, 1440, 504, 72, 2160];
+                    const confidenceValues = [0.89, 0.92, 0.85, 0.88, 0.95, 0.82];
+                    
+                    this.charts.rulChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: machines,
+                            datasets: [
+                                {
+                                    label: 'RUL (hours)',
+                                    data: rulValues,
+                                    backgroundColor: 'rgba(26, 115, 232, 0.7)',
+                                    borderColor: '#1a73e8',
+                                    borderWidth: 2,
+                                    borderRadius: 6,
+                                    yAxisID: 'y'
+                                },
+                                {
+                                    label: 'Confidence',
+                                    data: confidenceValues,
+                                    type: 'line',
+                                    borderColor: '#34a853',
+                                    backgroundColor: 'rgba(52, 168, 83, 0.1)',
+                                    tension: 0.4,
+                                    fill: true,
+                                    borderWidth: 3,
+                                    yAxisID: 'y1'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top',
+                                    labels: {
+                                        usePointStyle: true,
+                                        padding: 10,
+                                        font: { size: 11, weight: '600' }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'left',
+                                    beginAtZero: true,
+                                    grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                                    ticks: { font: { size: 10, weight: '600' } }
+                                },
+                                y1: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'right',
+                                    min: 0,
+                                    max: 1,
+                                    grid: { drawOnChartArea: false },
+                                    ticks: {
+                                        font: { size: 10, weight: '600' },
+                                        callback: function(value) {
+                                            return (value * 100) + '%';
+                                        }
+                                    }
+                                },
+                                x: {
+                                    grid: { display: false },
+                                    ticks: { font: { size: 10, weight: '600' } }
+                                }
+                            }
+                        }
+                    });
+                },
+                
+                initEfficiencyChart() {
+                    const ctx = document.getElementById('efficiencyChart');
+                    
+                    const labels = [];
+                    const efficiencyData = [];
+                    const uptimeData = [];
+                    
+                    for (let i = 30; i >= 0; i--) {
+                        const date = new Date();
+                        date.setDate(date.getDate() - i);
+                        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+                        
+                        const baseEfficiency = 85 + (30 - i) * 0.3 + Math.random() * 5;
+                        const baseUptime = 93 + (30 - i) * 0.2 + Math.random() * 3;
+                        
+                        efficiencyData.push(Math.min(100, baseEfficiency));
+                        uptimeData.push(Math.min(100, baseUptime));
+                    }
+                    
+                    this.charts.efficiencyChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                {
+                                    label: 'Efficiency Score',
+                                    data: efficiencyData,
+                                    borderColor: '#1a73e8',
+                                    backgroundColor: 'rgba(26, 115, 232, 0.1)',
+                                    tension: 0.4,
+                                    fill: true,
+                                    borderWidth: 2,
+                                    pointRadius: 0
+                                },
+                                {
+                                    label: 'Uptime %',
+                                    data: uptimeData,
+                                    borderColor: '#34a853',
+                                    backgroundColor: 'rgba(52, 168, 83, 0.1)',
+                                    tension: 0.4,
+                                    fill: true,
+                                    borderWidth: 2,
+                                    pointRadius: 0
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top',
+                                    labels: {
+                                        usePointStyle: true,
+                                        padding: 10,
+                                        font: { size: 11, weight: '600' }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    min: 70,
+                                    max: 100,
+                                    grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                                    ticks: {
+                                        font: { size: 10, weight: '600' },
+                                        callback: function(value) {
+                                            return value + '%';
+                                        }
+                                    }
+                                },
+                                x: {
+                                    grid: { display: false },
+                                    ticks: {
+                                        font: { size: 10, weight: '600' },
+                                        maxRotation: 45,
+                                        minRotation: 45,
+                                        autoSkip: true,
+                                        maxTicksLimit: 10
+                                    }
+                                }
+                            }
+                        }
+                    });
+                },
+                
+                initHealthChart() {
+                    const ctx = document.getElementById('healthChart');
+                    
+                    this.charts.healthChart = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Healthy', 'Warning', 'Critical'],
+                            datasets: [{
+                                data: [85, 12, 3],
+                                backgroundColor: ['#34a853', '#fbbc04', '#ea4335'],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'bottom',
+                                    labels: {
+                                        usePointStyle: true,
+                                        padding: 10,
+                                        font: { size: 11, weight: '600' }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                },
+                
+                initMaintenanceChart() {
+                    const ctx = document.getElementById('maintenanceChart');
+                    const machines = ['M-001', 'M-002', 'M-003', 'M-004', 'M-005', 'M-006'];
+                    
+                    this.charts.maintenanceChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: machines,
+                            datasets: [{
+                                label: 'Days Until Maintenance',
+                                data: [30, 7, 60, 21, 3, 90],
+                                backgroundColor: machines.map((_, i) => {
+                                    const days = [30, 7, 60, 21, 3, 90][i];
+                                    return days < 7 ? '#ea4335' : days < 14 ? '#fbbc04' : '#34a853';
+                                }),
+                                borderRadius: 6,
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                                    ticks: { font: { size: 10, weight: '600' } }
+                                },
+                                x: {
+                                    grid: { display: false },
+                                    ticks: { font: { size: 10, weight: '600' } }
+                                }
+                            }
+                        }
+                    });
+                },
+                
+                initCostChart() {
+                    const ctx = document.getElementById('costChart');
+                    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+                    
+                    this.charts.costChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: months,
+                            datasets: [
+                                {
+                                    label: 'Downtime Cost',
+                                    data: [12000, 9500, 8200, 7100, 6500, 5800],
+                                    backgroundColor: 'rgba(234, 67, 53, 0.7)',
+                                    borderRadius: 6
+                                },
+                                {
+                                    label: 'Savings',
+                                    data: [8000, 10500, 11800, 12900, 13500, 14200],
+                                    backgroundColor: 'rgba(52, 168, 83, 0.7)',
+                                    borderRadius: 6
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top',
+                                    labels: {
+                                        usePointStyle: true,
+                                        padding: 10,
+                                        font: { size: 11, weight: '600' }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                                    ticks: {
+                                        font: { size: 10, weight: '600' },
+                                        callback: function(value) {
+                                            return '$' + (value / 1000) + 'K';
+                                        }
+                                    }
+                                },
+                                x: {
+                                    grid: { display: false },
+                                    ticks: { font: { size: 10, weight: '600' } }
+                                }
+                            }
+                        }
+                    });
+                },
+                
+                startRealtimeUpdates() {
+                    setInterval(() => {
+                        this.addNewDataPoint();
+                        
+                        if (this.vizMode === 'chartjs' && this.charts.anomalyChart) {
+                            this.updateChartJSChart();
+                        } else if (this.vizMode === 'plotly') {
+                            this.updatePlotlyChart();
+                        } else if (this.vizMode === 'micro') {
+                            this.updateMicroCharts();
+                        }
+                    }, this.updateRate);
+                },
+                
+                addNewDataPoint() {
+                    const now = new Date();
+                    this.fullDataset.timestamps.push(now);
+                    
+                    const baseTemp = 65 + Math.sin(Date.now() / 30000) * 8;
+                    const baseVib = 15 + Math.sin(Date.now() / 20000) * 4;
+                    
+                    const isAnomaly = Math.random() > 0.98;
+                    const tempValue = isAnomaly ? baseTemp + Math.random() * 20 : baseTemp + (Math.random() - 0.5) * 2;
+                    const vibValue = isAnomaly ? baseVib + Math.random() * 15 : baseVib + (Math.random() - 0.5);
+                    
+                    this.fullDataset.temperature.push(tempValue);
+                    this.fullDataset.vibration.push(vibValue);
+                    this.fullDataset.anomalyFlags.push(isAnomaly ? vibValue : null);
+                    
+                    if (this.fullDataset.timestamps.length > 1000) {
+                        this.fullDataset.timestamps.shift();
+                        this.fullDataset.temperature.shift();
+                        this.fullDataset.vibration.shift();
+                        this.fullDataset.anomalyFlags.shift();
+                    }
+                    
+                    this.totalDataPoints = this.fullDataset.timestamps.length;
+                    
+                    if (isAnomaly) {
+                        this.addAnomaly();
+                    }
+                },
+                
+                updateChartJSChart() {
+                    const chart = this.charts.anomalyChart;
+                    if (!chart) return;
+                    
+                    const processedData = this.getProcessedData();
+                    
+                    chart.data.labels = processedData.labels;
+                    chart.data.datasets[0].data = processedData.temperature;
+                    chart.data.datasets[1].data = processedData.vibration;
+                    chart.data.datasets[2].data = processedData.anomalyFlags;
+                    
+                    chart.update('none');
+                },
+                
+                updatePlotlyChart() {
+                    const processedData = this.getProcessedData();
+                    
+                    const anomalyIndices = processedData.anomalyFlags
+                        .map((val, idx) => val !== null ? idx : null)
+                        .filter(idx => idx !== null);
+                    
+                    Plotly.update('plotlyChart', {
+                        x: [processedData.labels, processedData.labels, anomalyIndices.map(idx => processedData.labels[idx])],
+                        y: [processedData.temperature, processedData.vibration, anomalyIndices.map(idx => processedData.anomalyFlags[idx])]
+                    });
+                },
+                
+                updateMicroCharts() {
+                    const processedData = this.getProcessedData();
+                    
+                    if (this.charts.microTemp) {
+                        this.charts.microTemp.data.labels = processedData.labels;
+                        this.charts.microTemp.data.datasets[0].data = processedData.temperature;
+                        this.charts.microTemp.update('none');
+                    }
+                    
+                    if (this.charts.microVib) {
+                        this.charts.microVib.data.labels = processedData.labels;
+                        this.charts.microVib.data.datasets[0].data = processedData.vibration;
+                        this.charts.microVib.update('none');
+                    }
+                    
+                    if (this.charts.microAnomaly) {
+                        const anomalyScores = processedData.temperature.map((temp, idx) => {
+                            const tempNorm = (temp - 60) / 40;
+                            const vibNorm = (processedData.vibration[idx] - 10) / 40;
+                            return Math.min(1, (tempNorm + vibNorm) / 2);
+                        });
+                        
+                        this.charts.microAnomaly.data.labels = processedData.labels;
+                        this.charts.microAnomaly.data.datasets[0].data = anomalyScores;
+                        this.charts.microAnomaly.data.datasets[0].backgroundColor = anomalyScores.map(score => 
+                            score > 0.8 ? '#ea4335' : score > 0.6 ? '#fbbc04' : '#34a853'
+                        );
+                        this.charts.microAnomaly.update('none');
+                    }
+                },
+                
+                switchVisualization() {
+                    this.addToFeed(`Switched to ${this.vizMode} visualization mode`);
+                    
+                    if (this.vizMode === 'plotly') {
+                        this.$nextTick(() => {
+                            this.initPlotlyChart();
+                        });
+                    } else if (this.vizMode === 'micro') {
+                        this.$nextTick(() => {
+                            this.initMicroSparklines();
+                        });
+                    } else if (this.vizMode === 'chartjs') {
+                        this.$nextTick(() => {
+                            this.initAnomalyChart();
+                        });
+                    }
+                },
+                
+                changeTimeWindow(window) {
+                    this.timeWindow = window;
+                    this.addToFeed(`Time window changed to ${window}`);
+                    
+                    if (this.vizMode === 'chartjs' && this.charts.anomalyChart) {
+                        this.updateChartJSChart();
+                    } else if (this.vizMode === 'plotly') {
+                        this.initPlotlyChart();
+                    } else if (this.vizMode === 'micro') {
+                        this.initMicroSparklines();
+                    }
+                },
+                
+                updateResolution() {
+                    this.addToFeed(`Data resolution changed to ${this.dataResolution}`);
+                    
+                    if (this.vizMode === 'chartjs' && this.charts.anomalyChart) {
+                        this.updateChartJSChart();
+                    } else if (this.vizMode === 'plotly') {
+                        this.initPlotlyChart();
+                    } else if (this.vizMode === 'micro') {
+                        this.initMicroSparklines();
+                    }
+                },
+                
+                startDemoSimulation() {
+                    this.toggleContinuousSimulation();
+                },
+                
+                generateReport() {
+                    this.addToFeed('Generating comprehensive AI analysis report...');
+                    
+                    // Generate report data
+                    this.reportData = {
+                        period: 'Last 24 Hours',
+                        dataPoints: this.totalDataPoints,
+                        health: 94.2,
+                        insights: [
+                            'System operating at 98.7% uptime with 94.2% efficiency score',
+                            'Detected 7 anomalies in the past 24 hours, 2 classified as critical',
+                            'Machine M-005 requires urgent maintenance within 72 hours (RUL: 72h)',
+                            'Temperature trends show improved stability with 15% reduction in variance',
+                            'Predictive maintenance recommendations could save $15,200 this month'
+                        ],
+                        recommendations: [
+                            {
+                                title: 'Immediate Action Required',
+                                description: 'Schedule maintenance for Machine M-005 within 3 days to prevent failure'
+                            },
+                            {
+                                title: 'Optimize Operating Parameters',
+                                description: 'Reduce vibration levels on Machine M-001 by adjusting belt tension'
+                            },
+                            {
+                                title: 'Preventive Maintenance',
+                                description: 'Plan maintenance for Machine M-002 in the next 7-14 days'
+                            }
+                        ]
+                    };
+                    
+                    this.showReportModal = true;
+                    
+                    // Initialize report chart
+                    this.$nextTick(() => {
+                        const ctx = document.getElementById('reportChart');
+                        if (ctx) {
+                            new Chart(ctx, {
+                                type: 'bar',
+                                data: {
+                                    labels: ['Uptime', 'Efficiency', 'Health', 'Performance', 'Cost Savings'],
+                                    datasets: [{
+                                        label: 'Metrics (%)',
+                                        data: [98.7, 94.2, 94.2, 92.5, 85.3],
+                                        backgroundColor: [
+                                            'rgba(52, 168, 83, 0.7)',
+                                            'rgba(26, 115, 232, 0.7)',
+                                            'rgba(52, 168, 83, 0.7)',
+                                            'rgba(26, 115, 232, 0.7)',
+                                            'rgba(52, 168, 83, 0.7)'
+                                        ],
+                                        borderRadius: 6
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: { display: false }
+                                    },
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            max: 100,
+                                            ticks: {
+                                                callback: function(value) {
+                                                    return value + '%';
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    });
+                    
+                    this.addToFeed('AI report generated successfully using Gemini insights');
+                },
+                
+                downloadReport() {
+                    this.addToFeed('Downloading comprehensive report PDF...');
+                    alert('Report download feature: In production, this would generate and download a PDF with all analysis data, visualizations, and recommendations.');
+                },
+                
+                simulateAnomaly() {
+                    this.addToFeed('Simulating critical anomaly event...');
+                    this.addAnomaly('critical');
+                    
+                    const lastIndex = this.fullDataset.anomalyFlags.length - 1;
+                    this.fullDataset.anomalyFlags[lastIndex] = 45;
+                    
+                    if (this.vizMode === 'chartjs' && this.charts.anomalyChart) {
+                        this.updateChartJSChart();
+                    } else if (this.vizMode === 'plotly') {
+                        this.updatePlotlyChart();
+                    }
+                },
+                
+                sendSensorData() {
+                    const data = {
+                        sensor_id: this.demoControls.sensorId,
+                        machine_id: this.demoControls.machineId,
+                        timestamp: new Date().toISOString(),
+                        metrics: {
+                            temperature: parseFloat(this.demoControls.temperature),
+                            vibration: parseFloat(this.demoControls.vibration),
+                            pressure: parseFloat(this.demoControls.pressure),
+                            rpm: parseFloat(this.demoControls.rpm)
+                        }
+                    };
+                    
+                    this.addToFeed(`Data sent: ${data.sensor_id} - Temp: ${data.metrics.temperature}°C, Vib: ${data.metrics.vibration}mm/s`);
+                    
+                    this.fullDataset.timestamps.push(new Date());
+                    this.fullDataset.temperature.push(data.metrics.temperature);
+                    this.fullDataset.vibration.push(data.metrics.vibration);
+                    
+                    const isAnomaly = data.metrics.temperature > 85 || data.metrics.vibration > 40;
+                    this.fullDataset.anomalyFlags.push(isAnomaly ? data.metrics.vibration : null);
+                    
+                    if (isAnomaly) {
+                        setTimeout(() => {
+                            this.addToFeed('Anomaly detected by Gemma AI model!');
+                            this.addAnomaly('high');
+                        }, 1000);
+                    }
+                },
+                
+                sendAnomalousData() {
+                    this.demoControls.temperature = 95;
+                    this.demoControls.vibration = 45;
+                    this.sendSensorData();
+                },
+                
+                toggleContinuousSimulation() {
+                    if (this.continuousRunning) {
+                        clearInterval(this.continuousInterval);
+                        this.continuousRunning = false;
+                        this.addToFeed('Continuous simulation stopped');
+                    } else {
+                        this.continuousRunning = true;
+                        this.addToFeed('Continuous simulation started - generating realistic sensor data');
+                        
+                        this.continuousInterval = setInterval(() => {
+                            this.demoControls.temperature = 60 + Math.random() * 20;
+                            this.demoControls.vibration = 10 + Math.random() * 15;
+                            this.demoControls.pressure = 5 + Math.random() * 2;
+                            this.demoControls.rpm = 2800 + Math.random() * 400;
+                            this.sendSensorData();
+                        }, 3000);
+                    }
+                },
+                
+                addAnomaly(severity = null) {
+                    const severities = ['critical', 'high', 'medium', 'low'];
+                    const selectedSeverity = severity || severities[Math.floor(Math.random() * severities.length)];
+                    
+                    const newAnomaly = {
+                        sensor: `Sensor_${String(Math.floor(Math.random() * 100)).padStart(3, '0')} - Machine_00${Math.floor(Math.random() * 6) + 1}`,
+                        severity: selectedSeverity,
+                        time: 'Just now',
+                        score: (0.5 + Math.random() * 0.5).toFixed(2)
+                    };
+                    
+                    this.recentAnomalies.unshift(newAnomaly);
+                    if (this.recentAnomalies.length > 5) {
+                        this.recentAnomalies.pop();
+                    }
+                    
+                    this.kpis[2].value++;
+                },
+                
+                addToFeed(message) {
+                    const now = new Date();
+                    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    
+                    this.realtimeFeed.unshift({
+                        time: timeStr,
+                        message: message
+                    });
+                    
+                    if (this.realtimeFeed.length > 10) {
+                        this.realtimeFeed.pop();
+                    }
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
