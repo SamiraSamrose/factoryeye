@@ -28,7 +28,7 @@ Data flows through MQTT to Pub/Sub, processed by agents, stored in BigQuery, wit
 
 ## Links
 
-- **Live Site Demo (No API Integration)**: 
+- **Live Site Demo (No API Integration)**: https://samirasamrose.github.io/factoryeye/
 - **Source Code**: https://github.com/SamiraSamrose/factoryeye
 - **Video Demo**: https://youtu.be/zXTwUWvDwbM
 
