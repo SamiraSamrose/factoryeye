@@ -1,0 +1,33 @@
+# Dockerfile for Sensor Sentinel Agent
+# Runs real-time anomaly detection with GPU support
+
+FROM nvidia/cuda:12.2.0-runtime-ubuntu22.04
+
+# Set working directory
+WORKDIR /app
+
+# Install Python and dependencies
+RUN apt-get update && apt-get install -y \
+    python3.11 \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY requirements.txt .
+
+# Install Python packages
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY backend/ ./backend/
+COPY frontend/ ./frontend/
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
+
+# Expose port
+EXPOSE 8000
+
+# Run Sensor Sentinel agent
+CMD ["python3", "-m", "backend.agents.sensor_sentinel"]

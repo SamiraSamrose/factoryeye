@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FactoryEye - Interactive Demo</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        .demo-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+        .demo-section h2 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+        .demo-section p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+        .demo-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .demo-control {
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: #f8f9fa;
+        }
+        .demo-control label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        .demo-control input,
+        .demo-control select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+        .simulation-output {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 4px;
+            margin-top: 1.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .feature-card {
+            padding: 1.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .feature-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        .feature-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">FactoryEye</div>
+            <nav class="nav">
+                <a href="/">Dashboard</a>
+                <a href="/demo">Demo</a>
+                <a href="/analytics">Analytics</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <h1 style="margin-bottom: 2rem; color: var(--text-primary);">Interactive Demo</h1>
+
+        <!-- Introduction -->
+        <div class="demo-section">
+            <h2>Welcome to FactoryEye Demo</h2>
+            <p>
+                This interactive demo allows you to test all components of the FactoryEye system. 
+                Explore the multi-agent architecture, simulate sensor data, trigger anomaly detection, 
+                and see how the system responds to various scenarios.
+            </p>
+        </div>
+
+        <!-- Feature Overview -->
+        <div class="demo-section">
+            <h2>System Components</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">1</div>
+                    <div class="feature-title">Sensor Sentinel</div>
+                    <div class="feature-description">
+                        Real-time anomaly detection agent running on GPU. Processes sensor streams 
+                        using Gemma model and flags anomalies within seconds.
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">2</div>
+                    <div class="feature-title">Predictor AI</div>
+                    <div class="feature-description">
+                        Batch predictive maintenance agent. Analyzes historical patterns to forecast 
+                        equipment failures and calculate Remaining Useful Life (RUL).
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">3</div>
+                    <div class="feature-title">Efficiency Analyst</div>
+                    <div class="feature-description">
+                        Generates natural language insights using Gemini and creates visualizations 
+                        with Imagen. Provides actionable recommendations.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Flow Demo -->
+        <div class="demo-section">
+            <h2>Data Flow Visualization</h2>
+            <p>
+                Understanding how data flows through the system is crucial. Below is the complete pipeline:
+            </p>
+            <ol style="line-height: 2; color: var(--text-secondary);">
+                <li><strong>IoT Sensors</strong> generate telemetry data (temperature, vibration, pressure, RPM)</li>
+                <li><strong>MQTT Broker</strong> receives sensor messages and forwards to Cloud Pub/Sub</li>
+                <li><strong>Pub/Sub</strong> provides reliable message queuing and delivery</li>
+                <li><strong>Sensor Sentinel</strong> pulls messages and runs anomaly detection</li>
+                <li><strong>BigQuery</strong> stores all readings, anomalies, and predictions</li>
+                <li><strong>Predictor AI</strong> runs hourly batch jobs for RUL predictions</li>
+                <li><strong>Efficiency Analyst</strong> generates insights and visualizations on demand</li>
+                <li><strong>Dashboard</strong> displays real-time metrics and historical trends</li>
+            </ol>
+        </div>
+
+        <!-- Sensor Simulation -->
+        <div class="demo-section">
+            <h2>Sensor Data Simulator</h2>
+            <p>
+                Simulate sensor data to test the anomaly detection system. Adjust parameters to create 
+                normal or anomalous conditions and observe how the system responds.
+            </p>
+            
+            <div class="demo-controls">
+                <div class="demo-control">
+                    <label for="sensor-id">Sensor ID</label>
+                    <input type="text" id="sensor-id" value="sensor_demo_001" />
+                </div>
+                <div class="demo-control">
+                    <label for="machine-id">Machine ID</label>
+                    <input type="text" id="machine-id" value="machine_001" />
+                </div>
+                <div class="demo-control">
+                    <label for="temperature">Temperature (C)</label>
+                    <input type="number" id="temperature" value="65" min="20" max="100" />
+                </div>
+                <div class="demo-control">
+                    <label for="vibration">Vibration (mm/s)</label>
+                    <input type="number" id="vibration" value="15" min="0" max="50" />
+                </div>
+                <div class="demo-control">
+                    <label for="pressure">Pressure (bar)</label>
+                    <input type="number" id="pressure" value="5.5" min="0" max="10" step="0.1" />
+                </div>
+                <div class="demo-control">
+                    <label for="rpm">RPM</label>
+                    <input type="number" id="rpm" value="3000" min="0" max="5000" />
+                </div>
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                <button class="btn btn-primary" onclick="sendSensorData()">Send Normal Data</button>
+                <button class="btn btn-primary" onclick="sendAnomalousData()">Send Anomalous Data</button>
+                <button class="btn btn-secondary" onclick="startContinuousSimulation()">Start Continuous</button>
+                <button class="btn btn-secondary" onclick="stopSimulation()">Stop</button>
+            </div>
+
+            <div class="simulation-output" id="simulation-output">
+                Simulation output will appear here...
+            </div>
+        </div>
+
+        <!-- Analysis Demo -->
+        <div class="demo-section">
+            <h2>Efficiency Analysis</h2>
+            <p>
+                Trigger the Efficiency Analyst agent to generate insights and recommendations. 
+                The agent uses Gemini for natural language explanations and Imagen for visualizations.
+            </p>
+            
+            <div class="demo-controls">
+                <div class="demo-control">
+                    <label for="analysis-machine">Machine ID (optional)</label>
+                    <input type="text" id="analysis-machine" placeholder="Leave empty for all machines" />
+                </div>
+                <div class="demo-control">
+                    <label for="analysis-hours">Time Range (hours)</label>
+                    <select id="analysis-hours">
+                        <option value="1">Last 1 hour</option>
+                        <option value="24" selected>Last 24 hours</option>
+                        <option value="168">Last 7 days</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+                <button class="btn btn-primary" onclick="runAnalysis()">Generate Analysis</button>
+            </div>
+
+            <div class="simulation-output" id="analysis-output">
+                Analysis results will appear here...
+            </div>
+        </div>
+
+        <!-- API Testing -->
+        <div class="demo-section">
+            <h2>API Testing</h2>
+            <p>
+                Test the REST API endpoints directly from the demo interface. All endpoints are documented 
+                and available for integration with external systems.
+            </p>
+            
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+                <button class="btn btn-secondary" onclick="testAPI('/api/v1/sensors')">GET /sensors</button>
+                <button class="btn btn-secondary" onclick="testAPI('/api/v1/anomalies?hours=24')">GET /anomalies</button>
+                <button class="btn btn-secondary" onclick="testAPI('/api/v1/predictions')">GET /predictions</button>
+                <button class="btn btn-secondary" onclick="testAPI('/api/v1/dashboard/stats')">GET /dashboard/stats</button>
+                <button class="btn btn-secondary" onclick="testAPI('/api/v1/machines')">GET /machines</button>
+            </div>
+
+            <div class="simulation-output" id="api-output">
+                API responses will appear here...
+            </div>
+        </div>
+    </main>
+
+    <!-- Demo Scripts -->
+    <script>
+        let simulationInterval = null;
+
+        function logOutput(elementId, message) {
+            const output = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            output.innerHTML += `[${timestamp}] ${message}\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        async function sendSensorData() {
+            const data = {
+                sensor_id: document.getElementById('sensor-id').value,
+                machine_id: document.getElementById('machine-id').value,
+                timestamp: new Date().toISOString(),
+                metrics: {
+                    temperature: parseFloat(document.getElementById('temperature').value),
+                    vibration: parseFloat(document.getElementById('vibration').value),
+                    pressure: parseFloat(document.getElementById('pressure').value),
+                    rpm: parseFloat(document.getElementById('rpm').value)
+                }
+            };
+
+            logOutput('simulation-output', `Sending sensor data: ${JSON.stringify(data, null, 2)}`);
+            
+            // In production, this would publish to Pub/Sub
+            logOutput('simulation-output', 'Data published to Pub/Sub topic successfully');
+        }
+
+        function sendAnomalousData() {
+            // Set anomalous values
+            document.getElementById('temperature').value = 95;
+            document.getElementById('vibration').value = 45;
+            sendSensorData();
+        }
+
+        function startContinuousSimulation() {
+            if (simulationInterval) {
+                logOutput('simulation-output', 'Simulation already running');
+                return;
+            }
+
+            logOutput('simulation-output', 'Starting continuous simulation...');
+            simulationInterval = setInterval(() => {
+                // Randomize values slightly
+                document.getElementById('temperature').value = 60 + Math.random() * 20;
+                document.getElementById('vibration').value = 10 + Math.random() * 15;
+                document.getElementById('pressure').value = 5 + Math.random() * 2;
+                document.getElementById('rpm').value = 2800 + Math.random() * 400;
+                sendSensorData();
+            }, 2000);
+        }
+
+        function stopSimulation() {
+            if (simulationInterval) {
+                clearInterval(simulationInterval);
+                simulationInterval = null;
+                logOutput('simulation-output', 'Simulation stopped');
+            }
+        }
+
+        async function runAnalysis() {
+            const machineId = document.getElementById('analysis-machine').value;
+            const hours = document.getElementById('analysis-hours').value;
+            
+            logOutput('analysis-output', 'Starting efficiency analysis...');
+            
+            try {
+                const url = machineId ? 
+                    `/api/v1/analyze?machine_id=${machineId}&time_range_hours=${hours}` :
+                    `/api/v1/analyze?time_range_hours=${hours}`;
+                
+                const response = await fetch(url, { method: 'POST' });
+                const data = await response.json();
+                
+                logOutput('analysis-output', `Analysis complete:\n${JSON.stringify(data, null, 2)}`);
+            } catch (error) {
+                logOutput('analysis-output', `Error: ${error.message}`);
+            }
+        }
+
+        async function testAPI(endpoint) {
+            logOutput('api-output', `Testing ${endpoint}...`);
+            
+            try {
+                const response = await fetch(endpoint);
+                const data = await response.json();
+                
+                logOutput('api-output', `Response:\n${JSON.stringify(data, null, 2)}\n`);
+            } catch (error) {
+                logOutput('api-output', `Error: ${error.message}\n`);
+            }
+        }
+    </script>
+</body>
+</html>

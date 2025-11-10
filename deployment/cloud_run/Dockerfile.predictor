@@ -1,0 +1,29 @@
+# Dockerfile for Predictor AI Agent
+# Runs batch predictive maintenance with GPU support
+
+FROM nvidia/cuda:12.2.0-runtime-ubuntu22.04
+
+# Set working directory
+WORKDIR /app
+
+# Install Python and dependencies
+RUN apt-get update && apt-get install -y \
+    python3.11 \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY requirements.txt .
+
+# Install Python packages
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY backend/ ./backend/
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
+
+# Run Predictor AI job
+CMD ["python3", "-c", "import asyncio; from backend.agents.predictor_ai import PredictorAI; asyncio.run(PredictorAI().run_prediction_job())"]

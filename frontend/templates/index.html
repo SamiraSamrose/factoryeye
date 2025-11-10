@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FactoryEye - Industrial IoT Monitoring Dashboard</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">FactoryEye</div>
+            <nav class="nav">
+                <a href="/">Dashboard</a>
+                <a href="/demo">Demo</a>
+                <a href="/analytics">Analytics</a>
+            </nav>
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span class="status-text">Connecting...</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Stats Grid -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Active Sensors</div>
+                <div class="stat-value" id="total-sensors">0</div>
+                <div class="stat-change positive">Live monitoring</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Machines Online</div>
+                <div class="stat-value" id="total-machines">0</div>
+                <div class="stat-change positive">All systems operational</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Anomalies (24h)</div>
+                <div class="stat-value" id="total-anomalies">0</div>
+                <div class="stat-change">Detected and flagged</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Urgent Maintenance</div>
+                <div class="stat-value" id="urgent-maintenance">0</div>
+                <div class="stat-change">Requires attention</div>
+            </div>
+        </section>
+
+        <!-- Charts Row 1 -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+            <!-- Anomaly Time Series -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2 class="chart-title">Real-Time Anomaly Detection</h2>
+                    <div class="chart-controls">
+                        <button class="btn btn-secondary" onclick="chartManager.loadHistoricalData(24)">24h</button>
+                        <button class="btn btn-secondary" onclick="chartManager.loadHistoricalData(168)">7d</button>
+                    </div>
+                </div>
+                <div style="height: 300px;">
+                    <canvas id="anomalyTimeSeriesChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Anomalies -->
+            <div class="anomaly-list" style="max-height: 400px; overflow-y: auto;">
+                <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); background: #f8f9fa;">
+                    <h3 style="margin: 0;">Recent Anomalies</h3>
+                </div>
+                <div id="anomaly-list">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row 2 -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+            <!-- Equipment Heatmap -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2 class="chart-title">Equipment Performance Heatmap</h2>
+                </div>
+                <div style="height: 300px;">
+                    <canvas id="equipmentHeatmapChart"></canvas>
+                </div>
+            </div>
+
+            <!-- RUL Predictions -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2 class="chart-title">Remaining Useful Life Predictions</h2>
+                </div>
+                <div style="height: 300px;">
+                    <canvas id="rulPredictionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Efficiency Trend -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h2 class="chart-title">Efficiency Trends</h2>
+            </div>
+            <div style="height: 300px;">
+                <canvas id="efficiencyTrendChart"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="/static/js/charts.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+    <script>
+        // Initialize charts when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            chartManager.initializeAll();
+        });
+    </script>
+</body>
+</html>
